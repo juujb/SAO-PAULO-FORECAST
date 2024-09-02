@@ -114,7 +114,7 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
 
                         lista.add(dadosDia)
                     }
-                    listaClimaState = lista!!
+                    listaClimaState = lista
                 }
             }
 
@@ -180,7 +180,7 @@ fun ClimaCard(dadosDia: DadosDiaFuturo){
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = dadosDia.dataDia.toString(),
+            Text(text = dadosDia.dataDia,
                 fontSize = 25.sp,
                 color = Color.White,
                 modifier = Modifier.padding(5.dp)
