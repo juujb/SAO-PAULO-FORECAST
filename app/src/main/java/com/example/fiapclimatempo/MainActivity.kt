@@ -1,8 +1,10 @@
 package com.example.fiapclimatempo
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,7 @@ import com.example.fiapclimatempo.screens.LocationSelection
 import com.example.fiapclimatempo.ui.theme.FIAPClimaTempoTheme
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
                             val long = backStackEntry.arguments?.getString("long")
                             val city = backStackEntry.arguments?.getString("city")
 
-                            ClimateForecast(navController, lat!!, long!!, city!!)
+                            ClimateForecast(lat!!, long!!, city!!)
                         }
                     }
                 }

@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import consultaclima.model.DadosDiaFuturo
 import consultaclima.model.RawResponse
 import consultaclima.service.RetrofitFactory
@@ -39,15 +39,14 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ClimateForecast(navController: NavController, lat: String?, long: String?, city: String?) {
+fun ClimateForecast(lat: String?, long: String?, city: String?) {
     var listaClimaState by remember { mutableStateOf(listOf<DadosDiaFuturo>()) }
-    var atualTemperaturaState by remember { mutableStateOf(0.0) }
-    var atualTempsMinState by remember { mutableStateOf(0.0) }
-    var atualTempsMaxState by remember { mutableStateOf(0.0) }
+    var atualTemperaturaState by remember { mutableDoubleStateOf(0.0) }
+    var atualTempsMinState by remember { mutableDoubleStateOf(0.0) }
+    var atualTempsMaxState by remember { mutableDoubleStateOf(0.0) }
     var nivelNuvensState by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.background(Color(0xFF00BFFF))){
-
+    Box(modifier = Modifier.background(Color(0xFF00BFFF))) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -58,27 +57,36 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
             val temperaturaAtualInt = atualTemperaturaState.toInt()
             val temperaturaMinInt = atualTempsMinState.toInt()
             val temperaturaMaxInt = atualTempsMaxState.toInt()
-            Text(text = "$city",
+
+            Text(
+                text = "$city",
                 fontSize = 30.sp,
                 color = Color.White
             )
-
-            Text(text = "$temperaturaAtualInt" + "ºC",
+            Text(
+                text = "$temperaturaAtualInt" + "ºC",
                 fontSize = 35.sp,
-                color = Color.White)
-            Row(){
-                Text(text = nivelNuvensState,
+                color = Color.White
+            )
+            Row() {
+                Text(
+                    text = nivelNuvensState,
                     fontSize = 25.sp,
-                    color = Color.White)
+                    color = Color.White
+                )
             }
-            Row(Modifier.padding(bottom = 10.dp)){
-                Text(text = "Min. " + "$temperaturaMinInt" + "ºC",
+            Row(Modifier.padding(bottom = 10.dp)) {
+                Text(
+                    text = "Min. " + "$temperaturaMinInt" + "ºC",
                     fontSize = 25.sp,
-                    color = Color.White)
+                    color = Color.White
+                )
                 Spacer(modifier = Modifier.width(50.dp))
-                Text(text = "Max. "+"$temperaturaMaxInt" + "ºC",
+                Text(
+                    text = "Max. "+"$temperaturaMaxInt" + "ºC",
                     fontSize = 25.sp,
-                    color = Color.White)
+                    color = Color.White
+                )
             }
             LazyColumn {
                 items(listaClimaState) {
@@ -87,8 +95,6 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
             }
         }
     }
-
-
 
     val lista = mutableListOf<DadosDiaFuturo>()
     if (lat != null && long != null) {
@@ -122,22 +128,21 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
                 TODO("Not yet implemented")
             }
         })
-
     }
-
 }
-fun getNivelNuvens(codigoClima: Int) : String{
+
+fun getNivelNuvens(codigoClima: Int) : String {
     var result = ""
-    if(codigoClima in 0..2){
+    if(codigoClima in 0..2) {
         result = "Ensolarado"
     }
-    if(codigoClima in 3..5){
+    if(codigoClima in 3..5) {
         result = "Parcialmente nublado"
     }
-    if(codigoClima in 6..8){
+    if(codigoClima in 6..8) {
         result = "Nublado"
     }
-    if(codigoClima in 9..10){
+    if(codigoClima in 9..10) {
         result = "Extremamente nublado"
     }
 
@@ -145,53 +150,62 @@ fun getNivelNuvens(codigoClima: Int) : String{
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatDate(data : String) : String{
+fun formatDate(data : String) : String {
     val formatter : DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val newformat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM")
     return LocalDate.parse(data, formatter).format(newformat)
-
 }
+
 @Composable
-fun ClimaCard(dadosDia: DadosDiaFuturo){
+fun ClimaCard(dadosDia: DadosDiaFuturo) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF3A8BFC)
         ),
-        modifier = Modifier.padding(bottom = 20.dp)){
+        modifier = Modifier.padding(bottom = 20.dp)
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
-        ){
-            Text(text = "Dia",
+        ) {
+            Text(
+                text = "Dia",
                 fontSize = 15.sp,
                 color = Color.White,
-                modifier = Modifier.padding(5.dp))
+                modifier = Modifier.padding(5.dp)
+            )
             Text(text = "Min.",
                 fontSize = 15.sp,
-                color = Color.White)
-            Text(text = "Max.",
+                color = Color.White
+            )
+            Text(
+                text = "Max.",
                 fontSize = 15.sp,
                 color = Color.White,
-                modifier = Modifier.padding(5.dp))
+                modifier = Modifier.padding(5.dp)
+            )
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = dadosDia.dataDia,
+            Text(
+                text = dadosDia.dataDia,
                 fontSize = 25.sp,
                 color = Color.White,
                 modifier = Modifier.padding(5.dp)
             )
             Spacer(modifier = Modifier.width(56.dp))
-            Text(text = dadosDia.minTemp.toInt().toString() + "ºC",
+            Text(
+                text = dadosDia.minTemp.toInt().toString() + "ºC",
                 fontSize = 25.sp,
                 color = Color.White,
             )
             Spacer(modifier = Modifier.width(56.dp))
-            Text(text = dadosDia.maxTemp.toInt().toString() + "ºC",
+            Text(
+                text = dadosDia.maxTemp.toInt().toString() + "ºC",
                 fontSize = 25.sp,
                 color = Color.White,
                 modifier = Modifier.padding(5.dp)
