@@ -1,7 +1,6 @@
 package com.example.fiapclimatempo.screens
 
 import android.os.Build
-import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,14 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,21 +28,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.fiapclimatempo.R
 import consultaclima.model.DadosDiaFuturo
-import consultaclima.model.Daily
 import consultaclima.model.RawResponse
-import consultaclima.service.ClimaService
 import consultaclima.service.RetrofitFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
-
-// Fazer telinha para mostra o clima (se necessário, fazer componentes na pasta específica)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ClimateForecast(navController: NavController, lat: String?, long: String?, city: String?) {
@@ -76,7 +67,7 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
                 fontSize = 35.sp,
                 color = Color.White)
             Row(){
-                Text(text = "$nivelNuvensState",
+                Text(text = nivelNuvensState,
                     fontSize = 25.sp,
                     color = Color.White)
             }
@@ -92,7 +83,6 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
             LazyColumn {
                 items(listaClimaState) {
                     ClimaCard(dadosDia = it)
-
                 }
             }
         }
@@ -100,7 +90,7 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
 
 
 
-    var lista = mutableListOf<DadosDiaFuturo>()
+    val lista = mutableListOf<DadosDiaFuturo>()
     if (lat != null && long != null) {
         val call = RetrofitFactory().getClimaService().getClima(lat, long)
         call.enqueue(object : Callback<RawResponse> {
@@ -108,15 +98,14 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
                 call: Call<RawResponse>,
                 response: Response<RawResponse>
             ) {
-                //pega a temp atual e lista todas as temperaturas dos 6 dias seguintes
                 atualTemperaturaState = response.body()?.current?.temperaturaAtual!!
                 atualTempsMinState = response.body()?.daily?.temperature2mMin?.get(0)!!
                 atualTempsMaxState = response.body()?.daily?.temperature2mMax?.get(0)!!
                 nivelNuvensState = getNivelNuvens(response.body()?.current?.codigoClima!!)
 
-                val responseDias = response.body()!!?.daily
+                val responseDias = response.body()!!.daily
                 if (responseDias != null) {
-                    for (i in 2..responseDias.temperature2mMax.size-1) {
+                    for (i in 2..<responseDias.temperature2mMax.size) {
                         val dadosDia = DadosDiaFuturo(
                             responseDias.temperature2mMin[i],
                             responseDias.temperature2mMax[i],
