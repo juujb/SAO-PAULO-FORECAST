@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +31,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fiapclimatempo.R
 import consultaclima.model.DadosDiaFuturo
+import consultaclima.model.Daily
 import consultaclima.model.RawResponse
 import consultaclima.service.ClimaService
 import consultaclima.service.RetrofitFactory
@@ -50,36 +55,44 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
     var atualTempsMaxState by remember { mutableStateOf(0.0) }
     var nivelNuvensState by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.background(Color.Cyan)){
+    Box(modifier = Modifier.background(Color(0xFF00BFFF))){
 
         Column(
             modifier = Modifier
+                .align(Alignment.TopCenter)
                 .fillMaxSize()
-                .padding(30.dp),
+                .padding(35.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
+            val temperaturaAtualInt = atualTemperaturaState.toInt()
+            val temperaturaMinInt = atualTempsMinState.toInt()
+            val temperaturaMaxInt = atualTempsMaxState.toInt()
             Text(text = "$city",
-                fontSize = 32.sp)
+                fontSize = 30.sp,
+                color = Color.White
+            )
 
-            Text(text = "$atualTemperaturaState")
+            Text(text = "$temperaturaAtualInt" + "ºC",
+                fontSize = 35.sp,
+                color = Color.White)
             Row(){
-                Text(text = "$nivelNuvensState")
+                Text(text = "$nivelNuvensState",
+                    fontSize = 25.sp,
+                    color = Color.White)
             }
-            Row(){
-                Text(text = "$atualTempsMinState")
+            Row(Modifier.padding(bottom = 10.dp)){
+                Text(text = "Min. " + "$temperaturaMinInt" + "ºC",
+                    fontSize = 25.sp,
+                    color = Color.White)
                 Spacer(modifier = Modifier.width(50.dp))
-                Text(text = "$atualTempsMaxState")
+                Text(text = "Max. "+"$temperaturaMaxInt" + "ºC",
+                    fontSize = 25.sp,
+                    color = Color.White)
             }
             LazyColumn {
                 items(listaClimaState) {
-                    Row() {
-                        Text(text = it.dataDia.toString())
-                        Spacer(modifier = Modifier.width(160.dp))
-                        Text(text = it.minTemp.toString())
-                        Spacer(modifier = Modifier.width(160.dp))
-                        Text(text = it.maxTemp.toString())
-                    }
+                    ClimaCard(dadosDia = it)
+
                 }
             }
         }
@@ -87,43 +100,43 @@ fun ClimateForecast(navController: NavController, lat: String?, long: String?, c
 
 
 
-        var lista = mutableListOf<DadosDiaFuturo>()
-        if (lat != null && long != null) {
-            val call = RetrofitFactory().getClimaService().getClima(lat, long)
-            call.enqueue(object : Callback<RawResponse> {
-                override fun onResponse(
-                    call: Call<RawResponse>,
-                    response: Response<RawResponse>
-                ) {
-                    //pega a temp atual e lista todas as temperaturas dos 6 dias seguintes
-                    atualTemperaturaState = response.body()?.current?.temperaturaAtual!!
-                    atualTempsMinState = response.body()?.daily?.temperature2mMin?.get(0)!!
-                    atualTempsMaxState = response.body()?.daily?.temperature2mMax?.get(0)!!
-                    nivelNuvensState = getNivelNuvens(response.body()?.current?.codigoClima!!)
+    var lista = mutableListOf<DadosDiaFuturo>()
+    if (lat != null && long != null) {
+        val call = RetrofitFactory().getClimaService().getClima(lat, long)
+        call.enqueue(object : Callback<RawResponse> {
+            override fun onResponse(
+                call: Call<RawResponse>,
+                response: Response<RawResponse>
+            ) {
+                //pega a temp atual e lista todas as temperaturas dos 6 dias seguintes
+                atualTemperaturaState = response.body()?.current?.temperaturaAtual!!
+                atualTempsMinState = response.body()?.daily?.temperature2mMin?.get(0)!!
+                atualTempsMaxState = response.body()?.daily?.temperature2mMax?.get(0)!!
+                nivelNuvensState = getNivelNuvens(response.body()?.current?.codigoClima!!)
 
-                    val responseDias = response.body()!!?.daily
-                    if (responseDias != null) {
-                        for (i in 1..responseDias.temperature2mMax.size-1) {
-                            val dadosDia = DadosDiaFuturo(
-                                responseDias.temperature2mMin[i],
-                                responseDias.temperature2mMax[i],
-                                formatDate(responseDias.time[i])
-                            )
+                val responseDias = response.body()!!?.daily
+                if (responseDias != null) {
+                    for (i in 2..responseDias.temperature2mMax.size-1) {
+                        val dadosDia = DadosDiaFuturo(
+                            responseDias.temperature2mMin[i],
+                            responseDias.temperature2mMax[i],
+                            formatDate(responseDias.time[i])
+                        )
 
-                            lista.add(dadosDia)
-                        }
-                        listaClimaState = lista!!
+                        lista.add(dadosDia)
                     }
+                    listaClimaState = lista!!
                 }
+            }
 
-                override fun onFailure(call: Call<RawResponse>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-            })
-
-        }
+            override fun onFailure(call: Call<RawResponse>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
 
     }
+
+}
 fun getNivelNuvens(codigoClima: Int) : String{
     var result = ""
     if(codigoClima in 0..2){
@@ -148,4 +161,52 @@ fun formatDate(data : String) : String{
     val newformat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM")
     return LocalDate.parse(data, formatter).format(newformat)
 
+}
+@Composable
+fun ClimaCard(dadosDia: DadosDiaFuturo){
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF3A8BFC)
+        ),
+        modifier = Modifier.padding(bottom = 20.dp)){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Text(text = "Dia",
+                fontSize = 15.sp,
+                color = Color.White,
+                modifier = Modifier.padding(5.dp))
+            Text(text = "Min.",
+                fontSize = 15.sp,
+                color = Color.White)
+            Text(text = "Max.",
+                fontSize = 15.sp,
+                color = Color.White,
+                modifier = Modifier.padding(5.dp))
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = dadosDia.dataDia.toString(),
+                fontSize = 25.sp,
+                color = Color.White,
+                modifier = Modifier.padding(5.dp)
+            )
+            Spacer(modifier = Modifier.width(56.dp))
+            Text(text = dadosDia.minTemp.toInt().toString() + "ºC",
+                fontSize = 25.sp,
+                color = Color.White,
+            )
+            Spacer(modifier = Modifier.width(56.dp))
+            Text(text = dadosDia.maxTemp.toInt().toString() + "ºC",
+                fontSize = 25.sp,
+                color = Color.White,
+                modifier = Modifier.padding(5.dp)
+            )
+        }
+    }
 }
