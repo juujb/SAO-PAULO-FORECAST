@@ -25,7 +25,7 @@ fun LocationButton(text: String, lat: String, long: String, navController: NavCo
         Text(
             text,
             style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 25.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             ),
             color = Color.Black,

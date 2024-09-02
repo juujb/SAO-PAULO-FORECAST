@@ -1,8 +1,12 @@
 package com.example.fiapclimatempo.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,14 +31,18 @@ fun AppHeader(modifier: Modifier = Modifier) {
         Text(
             text = "São Paulo Forecast",
             style = MaterialTheme.typography.headlineLarge.copy(
-                fontSize = 45.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.ExtraBold
             ),
             color = Color.White
         )
+        val imageModifier = Modifier
+            .size(150.dp)
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
+            modifier = imageModifier
         )
     }
 }
+
